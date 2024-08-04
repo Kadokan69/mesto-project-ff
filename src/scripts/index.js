@@ -1,13 +1,4 @@
-// @todo: Темплейт карточки - initialCards
-
-// @todo: DOM узлы
-
-// @todo: Функция создания карточки
-
-// @todo: Функция удаления карточки
-
-// @todo: Вывести карточки на страницу
-
+import {initialCards} from '../scripts/cards.js';
 const cardTemplate = document.querySelector('#card-template').content;
 const placesContainer = document.querySelector('.places__list');
 
