@@ -16,9 +16,7 @@ function createCard(card) {
     cardImage.alt = card.name;
     
     removeButton.addEventListener('click', () => deleteCard(removeButton));
-    cardPopup.addEventListener('click', () => {
-      popupImage.classList.add('popup_is-opened');
-    });
+    cardPopup.addEventListener('click', () => openPopup(popupImage));
     
     return cardElement;
   }
@@ -30,18 +28,8 @@ function deleteCard(deleteItem) {
 
 initialCards.forEach((itemCard) => placesContainer.append(createCard(itemCard)));
 
-// Закрытие Попапа
-const popup = document.querySelector('.page__content');
 
-popup.addEventListener('click', function (evt) {
-  if (evt.target.classList.contains('popup__close') || evt.target.classList.contains('popup')) {
-    
-    const closed = evt.target.classList.contains('popup');
-    console.log(closed)
-    // closed.classList.remove('popup_is-opened');
-    // closed.classList.add('popup_is-animated');
-  }
-}); 
+ 
 
 
 //Попап редактирования профиля
@@ -57,6 +45,30 @@ const popupNewCard = document.querySelector('.popup_type_new-card');
 
 addCardButton.addEventListener('click', () => openPopup(popupNewCard));
 
+// Открытие и Закрытие Попапа
 function openPopup(open) {
   open.classList.add('popup_is-opened');
+
+  const popup = document.querySelector('.page');
+
+  popup.addEventListener('click', closedPopClick);
+  popup.addEventListener('keydown', closedPopEsc);
+
+  function closedPopClick(evt) {
+    if (evt.target.classList.contains('popup__close') || evt.target.classList.contains('popup')) {
+      open.classList.remove('popup_is-opened');
+      open.classList.add('popup_is-animated');
+      popup.removeEventListener('keydown', closedPopEsc);
+      popup.removeEventListener('click', closedPopClick);
+    }
+  }
+
+  function closedPopEsc(evt) {
+  if (evt.key === 'Escape') {
+    open.classList.remove('popup_is-opened');
+    open.classList.add('popup_is-animated');
+    popup.removeEventListener('keydown', closedPopEsc);
+    popup.removeEventListener('click', closedPopClick);
+  }
+};
 };
