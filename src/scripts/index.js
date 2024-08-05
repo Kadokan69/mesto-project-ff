@@ -11,7 +11,6 @@ function createCard(card) {
     const popupImage = document.querySelector('.popup_type_image');
     const cardPopup = cardElement.querySelector('.card');
     
-    console.log(cardElement);
     cardElement.querySelector('.card__title').textContent = card.name;
     cardImage.src = card.link;
     cardImage.alt = card.name;
@@ -32,27 +31,32 @@ function deleteCard(deleteItem) {
 initialCards.forEach((itemCard) => placesContainer.append(createCard(itemCard)));
 
 // Закрытие Попапа
-const popup = document.querySelector('.popup');
-const closedPopup = document.querySelector('.popup__close');
-closedPopup.addEventListener('click', () => {
-  popup.classList.remove('popup_is-opened')
-  popup.classList.add('popup_is-animated')
-});
+const popup = document.querySelector('.page__content');
+
+popup.addEventListener('click', function (evt) {
+  if (evt.target.classList.contains('popup__close') || evt.target.classList.contains('popup')) {
+    
+    const closed = evt.target.classList.contains('popup');
+    console.log(closed)
+    // closed.classList.remove('popup_is-opened');
+    // closed.classList.add('popup_is-animated');
+  }
+}); 
 
 
 //Попап редактирования профиля
 const popupEdit = document.querySelector('.popup_type_edit');
 const profilEditButton = document.querySelector('.profile__edit-button');
 
-profilEditButton.addEventListener('click', () => {
-  popupEdit.classList.add('popup_is-opened')
+profilEditButton.addEventListener('click', () => openPopup(popupEdit));
 
-});
 
 //Попап добавления новой карточки
 const addCardButton = document.querySelector('.profile__add-button');
 const popupNewCard = document.querySelector('.popup_type_new-card');
 
-addCardButton.addEventListener('click', () => {
-  popupNewCard.classList.add('popup_is-opened')
-});
+addCardButton.addEventListener('click', () => openPopup(popupNewCard));
+
+function openPopup(open) {
+  open.classList.add('popup_is-opened');
+};
