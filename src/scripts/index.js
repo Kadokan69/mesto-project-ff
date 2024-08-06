@@ -10,14 +10,18 @@ function createCard(card) {
     const removeButton = cardElement.querySelector('.card__delete-button');
     const cardImage = cardElement.querySelector('.card__image');
     const popupImage = document.querySelector('.popup_type_image');
-    const cardPopup = cardElement.querySelector('.card');
-    
+    const cardPopup = cardElement.querySelector('.card__image');
+    const likeButton = cardElement.querySelector('.card__like-button');
+    const imagePopup = popupImage.querySelector('.popup__image');
+    const captiomPopup = popupImage.querySelector('.popup__caption');
+
     cardElement.querySelector('.card__title').textContent = card.name;
     cardImage.src = card.link;
     cardImage.alt = card.name;
     
     removeButton.addEventListener('click', () => deleteCard(removeButton));
-    cardPopup.addEventListener('click', () => openPopup(popupImage));
+    cardPopup.addEventListener('click', () => openPopup(popupImage, imagePopup, captiomPopup, card.link, card.name));
+    likeButton.addEventListener('click', () => {likeButton.classList.toggle('card__like-button_is-active')})
     
     return cardElement;
   }
@@ -43,9 +47,9 @@ const popupNewCard = document.querySelector('.popup_type_new-card');
 addCardButton.addEventListener('click', () => openPopup(popupNewCard));
 
 //Редактирование Профиля
-const formElement = document.querySelector('.popup_type_edit');// Воспользуйтесь методом querySelector()
-const nameInput = document.querySelector('.popup__input_type_name');// Воспользуйтесь инструментом .querySelector()
-const jobInput = document.querySelector('.popup__input_type_description');// Воспользуйтесь инструментом .querySelector()
+const formElement = document.querySelector('.popup_type_edit');
+const nameInput = document.querySelector('.popup__input_type_name');
+const jobInput = document.querySelector('.popup__input_type_description');
 
 function handleFormSubmit(evt) {
     evt.preventDefault(); 
@@ -60,6 +64,7 @@ function handleFormSubmit(evt) {
 
 formElement.addEventListener('submit', handleFormSubmit);
 
+//Создание новой карточки
 const newCardName = document.querySelector('.popup__input_type_card-name');
 const newCardUrl = document.querySelector('.popup__input_type_url');
 
