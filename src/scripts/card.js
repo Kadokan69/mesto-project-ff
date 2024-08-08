@@ -1,24 +1,22 @@
 import {cardTemplate} from '../index.js';
-import {openPopup} from './popup.js';
-export{createCard, deleteCard}
+import {openPopup} from './modal.js';
 
 // Создание крточки
-function createCard(card) {
+export function createCard(card) {
   const cardElement = cardTemplate.cloneNode(true);
   const removeButton = cardElement.querySelector('.card__delete-button');
   const cardImage = cardElement.querySelector('.card__image');
-  const popupImage = document.querySelector('.popup_type_image');
-  const cardPopup = cardElement.querySelector('.card__image');
+  const popupCard = document.querySelector('.popup_type_image');
   const likeButton = cardElement.querySelector('.card__like-button');
-  const imagePopup = popupImage.querySelector('.popup__image');
-  const captiomPopup = popupImage.querySelector('.popup__caption');
+  const imagePopup = popupCard.querySelector('.popup__image');
+  const captiomPopup = popupCard.querySelector('.popup__caption');
 
   cardElement.querySelector('.card__title').textContent = card.name;
   cardImage.src = card.link;
   cardImage.alt = card.name;
   
   removeButton.addEventListener('click', () => deleteCard(removeButton));
-  cardPopup.addEventListener('click', () => imgPopup(popupImage, imagePopup, captiomPopup, card.link, card.name));
+  cardImage.addEventListener('click', () => addImgPopup(popupCard, imagePopup, captiomPopup, card.link, card.name));
   likeButton.addEventListener('click', () => likeButton.classList.toggle('card__like-button_is-active'))
   
   return cardElement;
@@ -31,9 +29,9 @@ function deleteCard(deleteItem) {
     }
 
 // Попап карточки    
-function imgPopup(open, image, captiom, link, name) {
+function addImgPopup(popup, image, captiom, link, name) {
     console.log();
     image.src = link;
     captiom.textContent = name;
-    openPopup(open)
+    openPopup(popup)
 }
