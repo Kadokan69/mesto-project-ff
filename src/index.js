@@ -1,6 +1,6 @@
 import "./pages/index.css";
 import { initialCards } from "./scripts/cards.js";
-import { createCard } from "./scripts/card.js";
+import { createCard, deleteCard, likeCard } from "./scripts/card.js";
 import { openPopup, closePopup } from "./scripts/modal.js";
 
 const cardTemplate = document.querySelector("#card-template").content;
@@ -19,16 +19,16 @@ const captiomPopup = popupCard.querySelector(".popup__caption");
 
 initialCards.forEach((itemCard) =>
   placesContainer.append(
-    createCard(itemCard, cardTemplate, addContentCardPopup),
+    createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
   ),
 );
 
 addCardButton.addEventListener("click", () => openPopup(popupNewCard));
 
-profilEditButton.addEventListener("click", () => profilPopup(profilEditPopup));
+profilEditButton.addEventListener("click", () => fillProfilePopup(profilEditPopup));
 
 // Добавление информации из профеля в попап профеля
-function profilPopup(popup) {
+function fillProfilePopup(popup) {
   nameInput.value = document.querySelector(".profile__title").textContent;
   jobInput.value = document.querySelector(".profile__description").textContent;
   openPopup(popup);
@@ -49,7 +49,7 @@ function handleFormNewCard(evt) {
   evt.preventDefault();
   const newCard = { name: newCardName.value, link: newCardUrl.value };
   placesContainer.prepend(
-    createCard(newCard, cardTemplate, addContentCardPopup),
+    createCard(newCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
   );
   document.forms["new-place"].reset();
   closePopup(popupNewCard);

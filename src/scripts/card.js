@@ -1,5 +1,5 @@
 // Создание крточки
-export function createCard(card, cardTemplate, addContentCardPopup) {
+export function createCard(card, cardTemplate, deleteCard, likeCard, addContentCardPopup) {
   const cardElement = cardTemplate.cloneNode(true);
   const cardImage = cardElement.querySelector(".card__image");
   const removeButton = cardElement.querySelector(".card__delete-button");
@@ -12,15 +12,18 @@ export function createCard(card, cardTemplate, addContentCardPopup) {
     addContentCardPopup(cardImage.src, cardTitile.textContent),
   );
   removeButton.addEventListener("click", () => deleteCard(removeButton));
-  likeButton.addEventListener("click", () =>
-    likeButton.classList.toggle("card__like-button_is-active"),
-  );
+  likeButton.addEventListener("click", () => likeCard(likeButton));
 
   return cardElement;
 }
 
 //Удаление карточки
-function deleteCard(deleteItem) {
+export function deleteCard(deleteItem) {
   const deleteCardItem = deleteItem.closest(".card");
   deleteCardItem.remove();
+}
+
+//Лайк карточки
+export function likeCard(likeButton) {
+  likeButton.classList.toggle("card__like-button_is-active")
 }

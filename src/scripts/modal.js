@@ -17,15 +17,11 @@ function eventClickListener(evt) {
     evt.target.classList.contains("popup__close") ||
     evt.target.classList.contains("popup")
   ) {
-    document
-      .querySelectorAll(".popup_is-opened")
-      .forEach((openPopup) => closePopup(openPopup));
-  }
+    closePopup(evt.currentTarget)
+ }
 }
 function eventEscListener(evt) {
   if (evt.key === "Escape") {
-    document
-      .querySelectorAll(".popup_is-opened")
-      .forEach((openPopup) => closePopup(openPopup));
-  }
+    closePopup(document.querySelector(".popup_is-opened"))
+ }
 }
