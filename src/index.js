@@ -2,6 +2,8 @@ import "./pages/index.css";
 import { initialCards } from "./scripts/cards.js";
 import { createCard, deleteCard, likeCard } from "./scripts/card.js";
 import { openPopup, closePopup } from "./scripts/modal.js";
+import { enableValidation } from "./scripts/validation.js"
+
 
 const cardTemplate = document.querySelector("#card-template").content;
 const placesContainer = document.querySelector(".places__list");
@@ -17,6 +19,10 @@ const popupCard = document.querySelector(".popup_type_image");
 const imagePopup = popupCard.querySelector(".popup__image");
 const captiomPopup = popupCard.querySelector(".popup__caption");
 
+
+enableValidation();
+
+
 initialCards.forEach((itemCard) =>
   placesContainer.append(
     createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
@@ -31,6 +37,9 @@ profilEditButton.addEventListener("click", () => fillProfilePopup(profilEditPopu
 function fillProfilePopup(popup) {
   nameInput.value = document.querySelector(".profile__title").textContent;
   jobInput.value = document.querySelector(".profile__description").textContent;
+  popup.querySelector(`.${nameInput.id}-error`).textContent = '';
+  popup.querySelector(`.${jobInput.id}-error`).textContent = '';
+  enableValidation();
   openPopup(popup);
 }
 
