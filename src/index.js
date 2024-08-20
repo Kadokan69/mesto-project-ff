@@ -2,7 +2,7 @@ import "./pages/index.css";
 import { initialCards } from "./scripts/cards.js";
 import { createCard, deleteCard, likeCard } from "./scripts/card.js";
 import { openPopup, closePopup } from "./scripts/modal.js";
-import { enableValidation } from "./scripts/validation.js"
+import { enableValidation, clearValidation } from "./scripts/validation.js"
 
 
 const cardTemplate = document.querySelector("#card-template").content;
@@ -18,10 +18,15 @@ const newCardUrl = document.querySelector(".popup__input_type_url");
 const popupCard = document.querySelector(".popup_type_image");
 const imagePopup = popupCard.querySelector(".popup__image");
 const captiomPopup = popupCard.querySelector(".popup__caption");
-
-
-enableValidation();
-
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+};
+enableValidation(validationConfig); 
 
 initialCards.forEach((itemCard) =>
   placesContainer.append(
@@ -37,10 +42,8 @@ profilEditButton.addEventListener("click", () => fillProfilePopup(profilEditPopu
 function fillProfilePopup(popup) {
   nameInput.value = document.querySelector(".profile__title").textContent;
   jobInput.value = document.querySelector(".profile__description").textContent;
-  popup.querySelector(`.${nameInput.id}-error`).textContent = '';
-  popup.querySelector(`.${jobInput.id}-error`).textContent = '';
-  enableValidation();
   openPopup(popup);
+  clearValidation(popup, validationConfig)
 }
 
 //Редактирование профиля
@@ -62,6 +65,7 @@ function handleFormNewCard(evt) {
   );
   document.forms["new-place"].reset();
   closePopup(popupNewCard);
+  enableValidation(validationConfig); 
 }
 
 popupNewCard.addEventListener("submit", handleFormNewCard);
