@@ -1,4 +1,4 @@
-// Создание крточки
+// Создание карточки
 export function createCard(card, cardTemplate, deleteCard, likeCard, addContentCardPopup) {
   const cardElement = cardTemplate.cloneNode(true);
   const cardImage = cardElement.querySelector(".card__image");

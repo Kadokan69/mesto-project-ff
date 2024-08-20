@@ -3,6 +3,7 @@ import { initialCards } from "./scripts/cards.js";
 import { createCard, deleteCard, likeCard } from "./scripts/card.js";
 import { openPopup, closePopup } from "./scripts/modal.js";
 import { enableValidation, clearValidation } from "./scripts/validation.js"
+import { getInitialCards, getInitialProfil } from "./scripts/api.js"
 
 
 const cardTemplate = document.querySelector("#card-template").content;
@@ -26,19 +27,44 @@ const validationConfig = {
   inputErrorClass: 'popup__input_type_error',
   errorClass: 'popup__error_visible'
 };
+
+getInitialProfil()
+  .then((result) => {
+    document.querySelector(".profile__title").textContent = result.name
+    document.querySelector(".profile__description").textContent = result.about
+    document.querySelector(".profile__image").style.backgroundImage = `url('${result.avatar}')`
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+  getInitialCards()
+    .then((result) => {
+      result.forEach((itemCard) =>
+        placesContainer.append(
+          createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
+        ),
+      );
+      
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+
 enableValidation(validationConfig); 
 
-initialCards.forEach((itemCard) =>
-  placesContainer.append(
-    createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
-  ),
-);
+// initialCards.forEach((itemCard) =>
+//   placesContainer.append(
+//     createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
+//   ),
+// );
 
 addCardButton.addEventListener("click", () => openPopup(popupNewCard));
 
 profilEditButton.addEventListener("click", () => fillProfilePopup(profilEditPopup));
 
-// Добавление информации из профеля в попап профеля
+// Добавление информации из профиля в попап профиля
 function fillProfilePopup(popup) {
   nameInput.value = document.querySelector(".profile__title").textContent;
   jobInput.value = document.querySelector(".profile__description").textContent;
@@ -51,12 +77,23 @@ function handleFormProfilEdit(evt) {
   evt.preventDefault();
   document.querySelector(".profile__title").textContent = nameInput.value;
   document.querySelector(".profile__description").textContent = jobInput.value;
+  fetch('https://nomoreparties.co/v1/wff-cohort-21/users/me', {
+    method: 'PATCH',
+    headers: {
+      authorization: 'a8ed8923-c1b8-4d93-ac19-168eae7fcf29',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: `${nameInput.value}`,
+      about: `${jobInput.value}`
+    })
+  });
   closePopup(profilEditPopup);
 }
 
 profilEditPopup.addEventListener("submit", handleFormProfilEdit);
 
-//Добавление новой краточки
+//Добавление новой карточки
 function handleFormNewCard(evt) {
   evt.preventDefault();
   const newCard = { name: newCardName.value, link: newCardUrl.value };
