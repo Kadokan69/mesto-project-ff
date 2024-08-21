@@ -4,10 +4,12 @@ export function createCard(card, cardTemplate, deleteCard, likeCard, addContentC
   const cardImage = cardElement.querySelector(".card__image");
   const removeButton = cardElement.querySelector(".card__delete-button");
   const likeButton = cardElement.querySelector(".card__like-button");
+  const likeScore = cardElement.querySelector(".card__like-score");
   const cardTitile = cardElement.querySelector(".card__title");
   cardTitile.textContent = card.name;
   cardImage.src = card.link;
   cardImage.alt = card.name;
+  likeScore.textContent = card.likes.length
   cardImage.addEventListener("click", () =>
     addContentCardPopup(cardImage.src, cardTitile.textContent),
   );
@@ -27,3 +29,4 @@ export function deleteCard(deleteItem) {
 export function likeCard(likeButton) {
   likeButton.classList.toggle("card__like-button_is-active")
 }
+

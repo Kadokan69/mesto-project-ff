@@ -1,5 +1,5 @@
+
 import "./pages/index.css";
-import { initialCards } from "./scripts/cards.js";
 import { createCard, deleteCard, likeCard } from "./scripts/card.js";
 import { openPopup, closePopup } from "./scripts/modal.js";
 import { enableValidation, clearValidation } from "./scripts/validation.js"
@@ -19,6 +19,7 @@ const newCardUrl = document.querySelector(".popup__input_type_url");
 const popupCard = document.querySelector(".popup_type_image");
 const imagePopup = popupCard.querySelector(".popup__image");
 const captiomPopup = popupCard.querySelector(".popup__caption");
+const deleteCardPopup = document.querySelector(".popup_type_delete-card");
 const validationConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -38,18 +39,18 @@ getInitialProfil()
     console.log(err);
   });
 
-  getInitialCards()
-    .then((result) => {
-      result.forEach((itemCard) =>
-        placesContainer.append(
-          createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
-        ),
-      );
-      
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+getInitialCards()
+  .then((result) => {
+    result.forEach((itemCard) =>
+      placesContainer.append(
+        createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
+      ),
+    );
+    
+  })
+  .catch((err) => {
+    console.log(err);
+  });
 
 
 enableValidation(validationConfig); 
@@ -96,10 +97,35 @@ profilEditPopup.addEventListener("submit", handleFormProfilEdit);
 //Добавление новой карточки
 function handleFormNewCard(evt) {
   evt.preventDefault();
-  const newCard = { name: newCardName.value, link: newCardUrl.value };
-  placesContainer.prepend(
-    createCard(newCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
-  );
+  fetch('https://nomoreparties.co/v1/wff-cohort-21/cards ', {
+    method: 'POST',
+    headers: {
+      authorization: 'a8ed8923-c1b8-4d93-ac19-168eae7fcf29',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: `${newCardName.value}`,
+      link: `${newCardUrl.value}`
+    })
+  });
+  getInitialCards()
+    .then((result) => {
+      
+      
+      result.forEach((itemCard) =>
+        placesContainer.append(
+          createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
+        ),
+      );
+      
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  //const newCard = { name: newCardName.value, link: newCardUrl.value };
+  // placesContainer.prepend(
+  //   createCard(newCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
+  // );
   document.forms["new-place"].reset();
   closePopup(popupNewCard);
   enableValidation(validationConfig); 
@@ -114,3 +140,5 @@ function addContentCardPopup(link, name) {
   imagePopup.alt = name;
   openPopup(popupCard);
 }
+
+// Попап удаления карточки
