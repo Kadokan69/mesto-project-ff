@@ -1,6 +1,5 @@
-
 import "./pages/index.css";
-import { createCard, deleteCard, likeCard } from "./scripts/card.js";
+import { createCard, likeCard, deleteCardPopup } from "./scripts/card.js";
 import { openPopup, closePopup } from "./scripts/modal.js";
 import { enableValidation, clearValidation } from "./scripts/validation.js"
 import { getInitialCards, getInitialProfil } from "./scripts/api.js"
@@ -19,7 +18,7 @@ const newCardUrl = document.querySelector(".popup__input_type_url");
 const popupCard = document.querySelector(".popup_type_image");
 const imagePopup = popupCard.querySelector(".popup__image");
 const captiomPopup = popupCard.querySelector(".popup__caption");
-const deleteCardPopup = document.querySelector(".popup_type_delete-card");
+
 const validationConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -43,10 +42,9 @@ getInitialCards()
   .then((result) => {
     result.forEach((itemCard) =>
       placesContainer.append(
-        createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
+        createCard(itemCard, cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup),
       ),
     );
-    
   })
   .catch((err) => {
     console.log(err);
@@ -54,12 +52,6 @@ getInitialCards()
 
 
 enableValidation(validationConfig); 
-
-// initialCards.forEach((itemCard) =>
-//   placesContainer.append(
-//     createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
-//   ),
-// );
 
 addCardButton.addEventListener("click", () => openPopup(popupNewCard));
 
@@ -107,25 +99,19 @@ function handleFormNewCard(evt) {
       name: `${newCardName.value}`,
       link: `${newCardUrl.value}`
     })
-  });
-  getInitialCards()
-    .then((result) => {
-      
-      
-      result.forEach((itemCard) =>
-        placesContainer.append(
-          createCard(itemCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
-        ),
-      );
-      
-    })
+  }).then(res => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  }).then((result) => {
+    placesContainer.prepend(
+      createCard(result, cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup)
+    )})
     .catch((err) => {
       console.log(err);
     });
-  //const newCard = { name: newCardName.value, link: newCardUrl.value };
-  // placesContainer.prepend(
-  //   createCard(newCard, cardTemplate, deleteCard, likeCard, addContentCardPopup),
-  // );
+        
   document.forms["new-place"].reset();
   closePopup(popupNewCard);
   enableValidation(validationConfig); 
@@ -140,5 +126,3 @@ function addContentCardPopup(link, name) {
   imagePopup.alt = name;
   openPopup(popupCard);
 }
-
-// Попап удаления карточки
