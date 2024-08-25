@@ -18,6 +18,9 @@ const newCardUrl = document.querySelector(".popup__input_type_url");
 const popupCard = document.querySelector(".popup_type_image");
 const imagePopup = popupCard.querySelector(".popup__image");
 const captiomPopup = popupCard.querySelector(".popup__caption");
+const profilAvatar = document.querySelector(".profile__image");
+const avatarEditPopup = document.querySelector(".popup_type_edit_avatar");
+const avatarPopupLink = avatarEditPopup.querySelector(".popup__input_type_edit_avatar")
 
 const validationConfig = {
   formSelector: '.popup__form',
@@ -32,7 +35,7 @@ getInitialProfil()
   .then((result) => {
     document.querySelector(".profile__title").textContent = result.name
     document.querySelector(".profile__description").textContent = result.about
-    document.querySelector(".profile__image").style.backgroundImage = `url('${result.avatar}')`
+    profilAvatar.style.backgroundImage = `url('${result.avatar}')`
   })
   .catch((err) => {
     console.log(err);
@@ -126,3 +129,36 @@ function addContentCardPopup(link, name) {
   imagePopup.alt = name;
   openPopup(popupCard);
 }
+
+//Попап редактирование аватара
+profilAvatar.addEventListener("click", () => {
+  openPopup(avatarEditPopup);
+})
+
+//Обновление аватара
+function updateAvatar(evt){
+  evt.preventDefault();
+  fetch('https://nomoreparties.co/v1/wff-cohort-21/users/me/avatar ', {
+    method: 'PATCH',
+    headers: {
+      authorization: 'a8ed8923-c1b8-4d93-ac19-168eae7fcf29',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      avatar: `${avatarPopupLink.value}`
+    })
+  })
+  .then(res => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  })
+  .then(result => {
+    console.log(result);
+    profilAvatar.style.backgroundImage = `url('${result.avatar}')`
+  });
+  closePopup(avatarEditPopup);
+  enableValidation(validationConfig); 
+};
+avatarEditPopup.addEventListener("submit", updateAvatar)
