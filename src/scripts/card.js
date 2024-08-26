@@ -1,5 +1,5 @@
 // Создание карточки
-export function createCard(card, cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup) {
+export function createCard(card, creator ,cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup) {
   const cardElement = cardTemplate.cloneNode(true);
   const cardImage = cardElement.querySelector(".card__image");
   const removeButton = cardElement.querySelector(".card__delete-button");
@@ -17,11 +17,11 @@ export function createCard(card, cardTemplate, likeCard, addContentCardPopup, op
   );
   removeButton.addEventListener("click", () => deleteCard(removeButton, deleteCardPopup, openPopup, closePopup, card));
   likeButton.addEventListener("click", () => likeCard(likeButton, card, likeScore));
-  if(card.owner._id !== '8e978d0da67fdc629650fdb2'){
+  if(card.owner._id !== creator._id){
     removeButton.remove();
   };
   card.likes.forEach(element => {
-    if(element._id === '8e978d0da67fdc629650fdb2'){
+    if(element._id == creator._id){
       likeButton.classList.toggle("card__like-button_is-active")
     };
   });

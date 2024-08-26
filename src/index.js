@@ -2,7 +2,7 @@ import "./pages/index.css";
 import { createCard, likeCard, deleteCardPopup } from "./scripts/card.js";
 import { openPopup, closePopup } from "./scripts/modal.js";
 import { enableValidation, clearValidation } from "./scripts/validation.js"
-import { getInitialCards, getInitialProfil } from "./scripts/api.js"
+import { getInitialCards, getInitialProfil, postCreatNewCard, patchProfilEdit, patchUpdateAvatar } from "./scripts/api.js"
 
 
 const cardTemplate = document.querySelector("#card-template").content;
@@ -18,10 +18,11 @@ const newCardUrl = document.querySelector(".popup__input_type_url");
 const popupCard = document.querySelector(".popup_type_image");
 const imagePopup = popupCard.querySelector(".popup__image");
 const captiomPopup = popupCard.querySelector(".popup__caption");
+const profileTitle = document.querySelector(".profile__title");
+const profileDescription = document.querySelector(".profile__description");
 const profilAvatar = document.querySelector(".profile__image");
 const avatarEditPopup = document.querySelector(".popup_type_edit_avatar");
-const avatarPopupLink = avatarEditPopup.querySelector(".popup__input_type_edit_avatar")
-
+const avatarPopupLink = avatarEditPopup.querySelector(".popup__input_type_edit_avatar");
 const validationConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -30,29 +31,42 @@ const validationConfig = {
   inputErrorClass: 'popup__input_type_error',
   errorClass: 'popup__error_visible'
 };
+const promises = [getInitialProfil(), getInitialCards()]
+
+Promise.all(promises)
+.then((result) => {
+  result[1].forEach((itemCard) =>
+    placesContainer.append(
+      createCard(itemCard, result[0], cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup),
+    ),
+  );
+})
+  .catch((err) => {
+    console.log(err);
+  });
 
 getInitialProfil()
   .then((result) => {
-    document.querySelector(".profile__title").textContent = result.name
-    document.querySelector(".profile__description").textContent = result.about
+    profileTitle.textContent = result.name
+    profileDescription.textContent = result.about
     profilAvatar.style.backgroundImage = `url('${result.avatar}')`
   })
   .catch((err) => {
     console.log(err);
   });
 
-getInitialCards()
-  .then((result) => {
-    result.forEach((itemCard) =>
-      placesContainer.append(
-        createCard(itemCard, cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup),
-      ),
-    );
-  })
-  .catch((err) => {
-    console.log(err);
-  });
 
+// getInitialCards()
+//   .then((result) => {
+//     result.forEach((itemCard) =>
+//       placesContainer.append(
+//         createCard(itemCard, cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup),
+//       ),
+//     );
+//   })
+//   .catch((err) => {
+//     console.log(err);
+//   });
 
 enableValidation(validationConfig); 
 
@@ -62,8 +76,8 @@ profilEditButton.addEventListener("click", () => fillProfilePopup(profilEditPopu
 
 // Добавление информации из профиля в попап профиля
 function fillProfilePopup(popup) {
-  nameInput.value = document.querySelector(".profile__title").textContent;
-  jobInput.value = document.querySelector(".profile__description").textContent;
+  nameInput.value = profileTitle.textContent;
+  jobInput.value = profileDescription.textContent;
   openPopup(popup);
   clearValidation(popup, validationConfig)
 }
@@ -71,19 +85,9 @@ function fillProfilePopup(popup) {
 //Редактирование профиля
 function handleFormProfilEdit(evt) {
   evt.preventDefault();
-  document.querySelector(".profile__title").textContent = nameInput.value;
-  document.querySelector(".profile__description").textContent = jobInput.value;
-  fetch('https://nomoreparties.co/v1/wff-cohort-21/users/me', {
-    method: 'PATCH',
-    headers: {
-      authorization: 'a8ed8923-c1b8-4d93-ac19-168eae7fcf29',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: `${nameInput.value}`,
-      about: `${jobInput.value}`
-    })
-  });
+  profileTitle.textContent = nameInput.value;
+  profileDescription.textContent = jobInput.value;
+  patchProfilEdit(nameInput, jobInput)
   closePopup(profilEditPopup);
 }
 
@@ -92,27 +96,17 @@ profilEditPopup.addEventListener("submit", handleFormProfilEdit);
 //Добавление новой карточки
 function handleFormNewCard(evt) {
   evt.preventDefault();
-  fetch('https://nomoreparties.co/v1/wff-cohort-21/cards ', {
-    method: 'POST',
-    headers: {
-      authorization: 'a8ed8923-c1b8-4d93-ac19-168eae7fcf29',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      name: `${newCardName.value}`,
-      link: `${newCardUrl.value}`
-    })
-  }).then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  }).then((result) => {
+  postCreatNewCard(newCardName, newCardUrl)
+  .then((result) => {
+    popupNewCard.querySelector('.button').textContent = 'Сохранение...';
     placesContainer.prepend(
       createCard(result, cardTemplate, likeCard, addContentCardPopup, openPopup, closePopup)
     )})
     .catch((err) => {
       console.log(err);
+    })
+    .finally(() => {
+      popupNewCard.querySelector('.button').textContent = 'Сохраненить';
     });
         
   document.forms["new-place"].reset();
@@ -128,37 +122,26 @@ function addContentCardPopup(link, name) {
   captiomPopup.textContent = name;
   imagePopup.alt = name;
   openPopup(popupCard);
-}
+};
 
 //Попап редактирование аватара
 profilAvatar.addEventListener("click", () => {
   openPopup(avatarEditPopup);
-})
+});
 
 //Обновление аватара
 function updateAvatar(evt){
   evt.preventDefault();
-  fetch('https://nomoreparties.co/v1/wff-cohort-21/users/me/avatar ', {
-    method: 'PATCH',
-    headers: {
-      authorization: 'a8ed8923-c1b8-4d93-ac19-168eae7fcf29',
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      avatar: `${avatarPopupLink.value}`
-    })
-  })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    return Promise.reject(`Ошибка: ${res.status}`);
-  })
+  patchUpdateAvatar(avatarPopupLink)
   .then(result => {
-    console.log(result);
-    profilAvatar.style.backgroundImage = `url('${result.avatar}')`
-  });
+    avatarEditPopup.querySelector('.button').textContent = 'Сохранение...';
+    profilAvatar.style.backgroundImage = `url('${result.avatar}')`;
+  })
+  .finally(() => {
+    avatarEditPopup.querySelector('.button').textContent = 'Сохраненить';
+  })
   closePopup(avatarEditPopup);
+  document.forms["edit_avatar"].reset();
   enableValidation(validationConfig); 
 };
-avatarEditPopup.addEventListener("submit", updateAvatar)
+avatarEditPopup.addEventListener("submit", updateAvatar);
