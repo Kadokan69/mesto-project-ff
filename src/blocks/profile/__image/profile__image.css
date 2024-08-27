@@ -11,10 +11,10 @@
 }
 
 .profile__image:hover::before {
-  content: '';
+  content: "";
   inset: 0;
   position: absolute;
-  background: #000000CC url('../../../images/edit-icon.svg') center no-repeat;
+  background: #000000cc url("../../../images/edit-icon.svg") center no-repeat;
   background-size: 26px;
   cursor: pointer;
 }
