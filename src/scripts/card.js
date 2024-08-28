@@ -37,11 +37,11 @@ export function createCard(
   likeButton.addEventListener("click", () =>
     likeCard(likeButton, card, likeScore, putLikeScore, deleteLikeScore),
   );
-  if (card.owner._id !== creator._id) {
+  if (card.owner._id !== creator) {
     removeButton.remove();
   }
   card.likes.forEach((element) => {
-    if (element._id == creator._id) {
+    if (element._id == creator) {
       likeButton.classList.toggle("card__like-button_is-active");
     }
   });

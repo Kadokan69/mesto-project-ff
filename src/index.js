@@ -42,13 +42,24 @@ const validationConfig = {
   errorClass: "popup__error_visible",
 };
 
+let ownerId;
+
+function renderLoading(check, popup) {
+  if (check === true) {
+    popup.querySelector(".button").textContent = "Сохранение...";
+  } else {
+    popup.querySelector(".button").textContent = "Сохранить";
+  }
+}
+
 Promise.all([getInitialProfil(), getInitialCards()])
   .then(([owner, cards]) => {
+    ownerId = owner._id;
     cards.forEach((itemCard) =>
       placesContainer.append(
         createCard(
           itemCard,
-          owner,
+          ownerId,
           cardTemplate,
           addContentCardPopup,
           openPopup,
@@ -62,6 +73,7 @@ Promise.all([getInitialProfil(), getInitialCards()])
     profileTitle.textContent = owner.name;
     profileDescription.textContent = owner.about;
     profilAvatar.style.backgroundImage = `url('${owner.avatar}')`;
+    console.log(ownerId);
   })
   .catch((err) => {
     console.log(err);
@@ -84,7 +96,7 @@ function fillProfilePopup(popup) {
 
 function handleFormProfilEdit(evt) {
   evt.preventDefault();
-  profilEditPopup.querySelector(".button").textContent = "Сохранение...";
+  renderLoading(true, profilEditPopup);
   patchProfilEdit({
     name: `${nameInput.value}`,
     about: `${jobInput.value}`,
@@ -98,7 +110,7 @@ function handleFormProfilEdit(evt) {
       console.log(err);
     })
     .finally(() => {
-      profilEditPopup.querySelector(".button").textContent = "Сохранить";
+      renderLoading(false, profilEditPopup);
     });
 }
 
@@ -106,19 +118,16 @@ profilEditPopup.addEventListener("submit", handleFormProfilEdit);
 
 function handleFormNewCard(evt) {
   evt.preventDefault();
-  popupNewCard.querySelector(".button").textContent = "Сохранение...";
-  Promise.all([
-    getInitialProfil(),
-    postNewCard({
-      name: `${newCardName.value}`,
-      link: `${newCardUrl.value}`,
-    }),
-  ])
-    .then(([owner, cards]) => {
+  renderLoading(true, popupNewCard);
+  postNewCard({
+    name: `${newCardName.value}`,
+    link: `${newCardUrl.value}`,
+  })
+    .then((cards) => {
       placesContainer.prepend(
         createCard(
           cards,
-          owner,
+          ownerId,
           cardTemplate,
           addContentCardPopup,
           openPopup,
@@ -130,13 +139,13 @@ function handleFormNewCard(evt) {
       );
       document.forms["new-place"].reset();
       closePopup(popupNewCard);
-      enableValidation(validationConfig);
+      clearValidation(popupNewCard, validationConfig);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
-      popupNewCard.querySelector(".button").textContent = "Сохранить";
+      renderLoading(false, popupNewCard);
     });
 }
 
@@ -149,14 +158,13 @@ function addContentCardPopup(link, name) {
   openPopup(popupCard);
 }
 
-
 profilAvatar.addEventListener("click", () => {
   openPopup(avatarEditPopup);
 });
 
 function updateAvatar(evt) {
   evt.preventDefault();
-  avatarEditPopup.querySelector(".button").textContent = "Сохранение...";
+  renderLoading(true, avatarEditPopup);
   patchUpdateAvatar({
     avatar: `${avatarPopupLink.value}`,
   })
@@ -164,10 +172,12 @@ function updateAvatar(evt) {
       profilAvatar.style.backgroundImage = `url('${result.avatar}')`;
       closePopup(avatarEditPopup);
       document.forms["edit_avatar"].reset();
-      enableValidation(validationConfig);
+    })
+    .catch((err) => {
+      console.log(err);
     })
     .finally(() => {
-      avatarEditPopup.querySelector(".button").textContent = "Сохраненить";
+      renderLoading(false, avatarEditPopup);
     });
 }
 
