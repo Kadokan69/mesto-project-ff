@@ -25,17 +25,17 @@ export function createCard(
     addContentCardPopup(cardImage.src, cardTitile.textContent),
   );
   removeButton.addEventListener("click", () =>
-    deleteCard(
+    deleteCard({
       removeButton,
       deleteCardPopup,
       openPopup,
       closePopup,
       card,
       deleteCardInServer,
-    ),
+    }),
   );
   likeButton.addEventListener("click", () =>
-    likeCard(likeButton, card, likeScore, putLikeScore, deleteLikeScore),
+    likeCard({ likeButton, card, likeScore, putLikeScore, deleteLikeScore }),
   );
   if (card.owner._id !== creator) {
     removeButton.remove();
@@ -49,43 +49,46 @@ export function createCard(
   return cardElement;
 }
 
-function deleteCard(
-  deleteItem,
-  deleteCardPopup,
-  openPopup,
-  closePopup,
-  card,
-  deleteCardInServer,
-) {
-  openPopup(deleteCardPopup);
-  const aceptDeletBuuton = document.getElementById("popup__button-delete-card");
-  aceptDeletBuuton.addEventListener(
-    "click",
-    () => {
-      const deleteCardItem = deleteItem.closest(".card");
-      deleteCardInServer(card._id);
-      deleteCardItem.remove();
-      closePopup(deleteCardPopup);
-    },
-    { once: true },
-  );
+function deleteCard(data) {
+  data.openPopup(data.deleteCardPopup);
+  data.deleteCardPopup.onsubmit = (evt) => submitDeleteCard(evt, data);
 }
 
-export function likeCard(
-  likeButton,
-  card,
-  likeScore,
-  putLikeScore,
-  deleteLikeScore,
-) {
-  likeButton.classList.toggle("card__like-button_is-active");
-  if (likeButton.classList.contains("card__like-button_is-active")) {
-    putLikeScore(card._id).then((result) => {
-      likeScore.textContent = result.likes.length;
+function submitDeleteCard(evt, data) {
+  evt.preventDefault();
+  data
+    .deleteCardInServer(data.card._id)
+    .then(() => {
+      data.closePopup(data.deleteCardPopup);
+      const deleteCardItem = data.removeButton.closest(".card");
+      deleteCardItem.remove();
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  } else {
-    deleteLikeScore(card._id).then((result) => {
-      likeScore.textContent = result.likes.length;
-    });
+}
+
+export function likeCard(data) {
+  if (!data.likeButton.classList.contains("card__like-button_is-active")) {
+    data
+      .putLikeScore(data.card._id)
+      .then((result) => {
+        data.likeScore.textContent = result.likes.length;
+        data.likeButton.classList.toggle("card__like-button_is-active");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
+  if (data.likeButton.classList.contains("card__like-button_is-active")) {
+    data
+      .deleteLikeScore(data.card._id)
+      .then((result) => {
+        data.likeScore.textContent = result.likes.length;
+        data.likeButton.classList.toggle("card__like-button_is-active");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 }

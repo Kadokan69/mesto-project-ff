@@ -37,7 +37,7 @@ export const deleteCardInServer = (data) => {
   return fetch(`${config.baseUrl}/cards/${data}`, {
     method: "DELETE",
     headers: config.headers,
-  });
+  }).then(handleResponse);
 };
 
 export const patchProfilEdit = (data) => {

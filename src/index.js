@@ -73,7 +73,6 @@ Promise.all([getInitialProfil(), getInitialCards()])
     profileTitle.textContent = owner.name;
     profileDescription.textContent = owner.about;
     profilAvatar.style.backgroundImage = `url('${owner.avatar}')`;
-    console.log(ownerId);
   })
   .catch((err) => {
     console.log(err);
@@ -172,6 +171,7 @@ function updateAvatar(evt) {
       profilAvatar.style.backgroundImage = `url('${result.avatar}')`;
       closePopup(avatarEditPopup);
       document.forms["edit_avatar"].reset();
+      clearValidation(avatarEditPopup, validationConfig);
     })
     .catch((err) => {
       console.log(err);
